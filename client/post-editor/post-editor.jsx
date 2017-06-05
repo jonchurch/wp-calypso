@@ -36,7 +36,7 @@ import config from 'config';
 import { getSelectedSiteId, getSelectedSite } from 'state/ui/selectors';
 import { setEditorLastDraft, resetEditorLastDraft } from 'state/ui/editor/last-draft/actions';
 import { getEditorPostId, getEditorPath } from 'state/ui/editor/selectors';
-import { receivePost, savePostSuccess } from 'state/posts/actions';
+import { editPost, receivePost, savePostSuccess } from 'state/posts/actions';
 import { getPostEdits, isEditedPostDirty } from 'state/posts/selectors';
 import { getCurrentUserId } from 'state/current-user/selectors';
 import { hasBrokenSiteUserConnection } from 'state/selectors';
@@ -670,7 +670,7 @@ export const PostEditor = React.createClass( {
 		}
 
 		if ( config.isEnabled( 'post-editor/delta-post-publish-flow' ) ) {
-			this.setConfirmationSidebar( 'closed' );
+			this.setConfirmationSidebar( 'publishing' );
 		}
 
 		// determine if this is a private publish
@@ -700,6 +700,10 @@ export const PostEditor = React.createClass( {
 
 	onPublishFailure: function( error ) {
 		this.onSaveFailure( error, 'publishFailure' );
+
+		if ( config.isEnabled( 'post-editor/delta-post-publish-flow' ) ) {
+			this.setConfirmationSidebar( 'closed' );
+		}
 	},
 
 	onPublishSuccess: function() {
@@ -712,6 +716,10 @@ export const PostEditor = React.createClass( {
 			message = 'scheduled';
 		} else {
 			message = 'published';
+		}
+
+		if ( config.isEnabled( 'post-editor/delta-post-publish-flow' ) ) {
+			this.setConfirmationSidebar( 'closed' );
 		}
 
 		this.onSaveSuccess( message, ( message === 'published' ? 'view' : 'preview' ), savedPost.URL );
@@ -732,9 +740,15 @@ export const PostEditor = React.createClass( {
 	},
 
 	setPostDate: function( date ) {
+		const { siteId, postId } = this.props;
 		const dateValue = date ? date.format() : null;
 		// TODO: REDUX - remove flux actions when whole post-editor is reduxified
 		actions.edit( { date: dateValue } );
+
+		if ( siteId && postId ) {
+			this.props.editPost( siteId, postId, { date: dateValue } );
+		}
+
 		this.checkForDateChange( dateValue );
 	},
 
@@ -875,6 +889,7 @@ export default connect(
 			setEditorLastDraft,
 			resetEditorLastDraft,
 			receivePost,
+			editPost,
 			savePostSuccess,
 			setEditorModePreference: savePreference.bind( null, 'editor-mode' ),
 			setEditorSidebar: savePreference.bind( null, 'editor-sidebar' ),
