@@ -6,13 +6,11 @@ import React, { PropTypes } from 'react';
 /**
  * Internal dependencies
  */
-import SiteStream from '../../../../reader/site-stream';
 
-const ReadingWidget = ( { className, site, title } ) => {
+const ReadingWidget = ( { className, title } ) => {
 	return (
 		<div className={ className } >
 			{ title }
-			<SiteStream site={ site } />
 		</div>
 	);
 };

@@ -102,7 +102,7 @@ class ShareWidget extends Component {
 					services.map( ( service ) => {
 						const link = url.format( service.urlProperties );
 						return (
-							<li className="share-widget__service" key={ service.slug }>
+							<li className="share-widget__service" key={ service.icon }>
 								<a href={ link } rel="noopener noreferrer" target="_blank">
 									<SocialLogo icon={ service.icon } size={ 48 } />
 								</a>
