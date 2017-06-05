@@ -63,8 +63,9 @@ class ManageNoOrders extends Component {
 	}
 
 	renderReadingWidget = () => {
+		const { site } = this.props;
 		return (
-			<ReadingWidget className="dashboard__reading-widget" />
+			<ReadingWidget className="dashboard__reading-widget" site={ site } />
 		);
 	}
 
